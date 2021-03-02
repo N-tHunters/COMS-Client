@@ -6,6 +6,7 @@ import (
     "os/user"
 	"net/http"
     "encoding/json"
+    // "fmt"
 )
 
 func Register(url string, client *http.Client) string {
@@ -16,7 +17,7 @@ func Register(url string, client *http.Client) string {
 
     name := user.Name
     username := user.Username
-    result := inter.PutHttp(url+"/api/client/", client, name, username)
+    result := inter.PutOrPostBecauseArturDoesNotWantToAddOneClassHttp(url+"/api/client/", client, name, username, "PUT")
 
     token := inter.Token{}
 

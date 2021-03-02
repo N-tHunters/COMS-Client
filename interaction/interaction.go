@@ -4,6 +4,7 @@ import (
 	"net/http"
     "encoding/json"
     "bytes"
+    "fmt"
 )
 
 func GetHttp(url string, client *http.Client) string {
@@ -33,17 +34,22 @@ type Data struct {
 }
 
 type Token struct {
-    Token string `json:"id"`
+    Token string `json:"token"`
 }
 
-func PutHttp(url string, client *http.Client, name string, username string) string {
+type Response struct {
+    Result string `json:"result"`
+    Error  string `json:"error"`
+}
+
+func PutOrPostBecauseArturDoesNotWantToAddOneClassHttp(url string, client *http.Client, name string, username string, method string) string {
     data := Data {
         Computer: name,
         Username: username,
     }
     json_data, err := json.Marshal(data)
 
-    req, _ := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(json_data))
+    req, _ := http.NewRequest(method, url, bytes.NewBuffer(json_data))
     req.Header.Set("Content-Type", "application/json; charset=utf-8")
     resp, err := client.Do(req)
 
@@ -69,14 +75,22 @@ func PutHttp(url string, client *http.Client, name string, username string) stri
     return result
 }
 
-func PutHttpToken(url string, client *http.Client, token []byte) string {
+func PutOrPostBecauseArturDoesNotWantToAddOneClassHttpToken(url string, client *http.Client, token []byte, method string) string {
     data := Token {
         Token: string(token),
     }
+
     json, _ := json.Marshal(data)
-    req, _ := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(json))
+    req, _ := http.NewRequest(method, url, bytes.NewBuffer(json))
     req.Header.Set("Content-Type", "application/json; charset=utf-8")
-    resp, _ := client.Do(req)
+    resp, err := client.Do(req)
+
+    for err != nil {
+        fmt.Println(err)
+        req, _ = http.NewRequest(method, url, bytes.NewBuffer(json))
+        req.Header.Set("Content-Type", "application/json; charset=utf-8")
+        resp, err = client.Do(req)
+    }
 
     defer resp.Body.Close()
 
@@ -94,4 +108,20 @@ func PutHttpToken(url string, client *http.Client, token []byte) string {
     }
 
     return result
+}
+
+func PutHttp(url string, client *http.Client, name string, username string) string {
+    return PutOrPostBecauseArturDoesNotWantToAddOneClassHttp(url, client, name, username, "PUT")
+}
+
+func PutHttpToken(url string, client *http.Client, token []byte) string {
+    return PutOrPostBecauseArturDoesNotWantToAddOneClassHttpToken(url, client, token, "PUT")
+}
+
+func PostHttp(url string, client *http.Client, name string, username string) string {
+    return PutOrPostBecauseArturDoesNotWantToAddOneClassHttp(url, client, name, username, "POST")
+}
+
+func PostHttpToken(url string, client *http.Client, token []byte) string {
+    return PutOrPostBecauseArturDoesNotWantToAddOneClassHttpToken(url, client, token, "POST")
 }
