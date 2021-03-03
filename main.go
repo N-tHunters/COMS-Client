@@ -15,6 +15,7 @@ import (
     "time"
     "os/exec"
     "encoding/json"
+    "os/user"
 )
 
 func main() {
@@ -23,7 +24,11 @@ func main() {
 	proxy := false
 	OS := runtime.GOOS
 	client := &http.Client{}
-	home := os.Getenv("HOME") + "/"
+	// home := os.Getenv("HOME") + "/"
+
+	thisUser, _ := user.Current()
+
+	home := thisUser.HomeDir
 
 	err := os.Mkdir(home + ".coms", 0750)
 

@@ -7,6 +7,7 @@ import (
 	"net/http"
     "encoding/json"
     // "fmt"
+    "os"
 )
 
 func Register(url string, client *http.Client) string {
@@ -16,7 +17,7 @@ func Register(url string, client *http.Client) string {
         panic(err)
     }
 
-    name := user.Name
+    name, _ := os.Hostname()
     username := user.Username
 
     data := inter.Data {
