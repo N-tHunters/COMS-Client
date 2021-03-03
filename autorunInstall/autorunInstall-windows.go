@@ -3,7 +3,7 @@
 package autorunInstall
 
 import (
-	"windows/registry"
+	"registry"
 	"fmt"
 )
 
