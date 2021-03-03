@@ -28,7 +28,7 @@ func main() {
 
 	thisUser, _ := user.Current()
 
-	home := thisUser.HomeDir
+	home := thisUser.HomeDir + "/"
 
 	err := os.Mkdir(home + ".coms", 0750)
 
