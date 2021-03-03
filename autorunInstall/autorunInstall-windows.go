@@ -9,7 +9,7 @@ import (
 
 func Install(path string) {
 	fmt.Println("Windows")
-	k, err := registry.OpenKey(registry.CURRENT_USER, `Software\Microsoft\Windows\CurrentVersion\Run`, registry.QUERY_VALUE)
+	k, err := registry.OpenKey(registry.CURRENT_USER, `Software\Microsoft\Windows\CurrentVersion\Run`, registry.QUERY_VALUE|registry.SET_VALUE)
 
 	if err != nil {
 		fmt.Println(err)
