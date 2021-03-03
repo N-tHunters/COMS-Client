@@ -1,2 +1,2 @@
 all:
-	go build main.go
+	go build -o COMS main.go
