@@ -11,7 +11,7 @@ import (
 func GetHttp(url string, client *http.Client) string {
 	resp, err := client.Get(url)
 
-    if (err != nil) {
+    for err != nil {
         resp, err = client.Get(url)
         time.Sleep(5 * time.Second)
     }

