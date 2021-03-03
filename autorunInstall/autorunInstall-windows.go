@@ -3,7 +3,7 @@
 package autorunInstall
 
 import (
-	"registry"
+	"golang.org/x/sys/windows/registry"
 	"fmt"
 )
 
