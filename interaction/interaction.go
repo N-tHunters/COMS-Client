@@ -5,10 +5,16 @@ import (
     // "encoding/json"
     "bytes"
     "fmt"
+    "time"
 )
 
 func GetHttp(url string, client *http.Client) string {
-	resp, _ := client.Get(url)
+	resp, err := client.Get(url)
+
+    if (err != nil) {
+        resp, err = client.Get(url)
+        time.Sleep(5 * time.Second)
+    }
 
 	defer resp.Body.Close()
 
