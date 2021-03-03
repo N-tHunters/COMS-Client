@@ -11,13 +11,22 @@ import (
 
 func Register(url string, client *http.Client) string {
 	user, err := user.Current()
+
     if err != nil {
         panic(err)
     }
 
     name := user.Name
     username := user.Username
-    result := inter.PutOrPostBecauseArturDoesNotWantToAddOneClassHttp(url+"/api/client/", client, name, username, "PUT")
+
+    data := inter.Data {
+        Computer: name,
+        Username: username,
+    }
+
+    dataInJson, _ := json.Marshal(data)
+
+    result := inter.PutHttp(url+"/api/client/", client, dataInJson)
 
     token := inter.Token{}
 

